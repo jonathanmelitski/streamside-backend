@@ -1,0 +1,19 @@
+name: Deploy to Firebase
+
+on: push
+
+jobs:
+    publish:
+        name: Publish Images
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main'
+        steps:
+        - uses: actions/checkout@v4
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: '20' # Specify your Node.js version
+        - name: Install Dependencies
+          run: npm install -g firebase
+        - name: Deploy
+          run: firebase deploy --token "${{ secrets.FIREBASE_TOKEN }}"
