@@ -6,6 +6,7 @@ from firebase_functions import https_fn, scheduler_fn
 from firebase_functions.options import set_global_options
 from firebase_admin import initialize_app, db
 import requests, json
+import toolz
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # For cost control, you can set the maximum number of containers that can be
@@ -26,6 +27,7 @@ def fetch_location(state: str):
     return list(map(lambda x: {
         "name": x["sourceInfo"]["siteName"],
         "id": x["sourceInfo"]["siteCode"][0]["value"],
+        "state": state.upper(),
         "geo": {
             "latitude": x["sourceInfo"]["geoLocation"]["geogLocation"]["latitude"],
             "longitude": x["sourceInfo"]["geoLocation"]["geogLocation"]["longitude"]
@@ -53,7 +55,8 @@ def fetch_usgs_locations(event: scheduler_fn.ScheduledEvent) -> None:
         for future in as_completed(futures):
             res = res + future.result()
 
-    storage_ref.set(res)
+    unique_locs = toolz.unique(res, key=lambda x: x["id"])
+    storage_ref.set(unique_locs)
 
 
 

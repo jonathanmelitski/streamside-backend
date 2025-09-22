@@ -26,4 +26,4 @@ jobs:
         - name: Install Dependencies
           run: npm install -g firebase-tools
         - name: Deploy
-          run: firebase deploy --token "${{ secrets.FIREBASE_TOKEN }}"
+          run: firebase deploy --token "${{ secrets.FIREBASE_TOKEN }}" --force
