@@ -20,16 +20,17 @@ initialize_app()
 def fetch_location(state: str):
     url = f"https://waterservices.usgs.gov/nwis/iv/?format=json&stateCd={state}&siteStatus=all&siteType=ST"
     res = requests.get(url)
-    json_data = json.loads(res.json())
+    print(f"Fetching state: {state}")
+    json_data = res.json()
     iterable = json_data["value"]["timeSeries"]
-    return map(lambda x: {
+    return list(map(lambda x: {
         "name": x["sourceInfo"]["siteName"],
         "id": x["sourceInfo"]["siteCode"][0]["value"],
         "geo": {
             "latitude": x["sourceInfo"]["geoLocation"]["geogLocation"]["latitude"],
             "longitude": x["sourceInfo"]["geoLocation"]["geogLocation"]["longitude"]
         }
-    }, iterable)
+    }, iterable))
 
 @scheduler_fn.on_schedule(schedule="0 0 1 */3 *")
 def fetch_usgs_locations(event: scheduler_fn.ScheduledEvent) -> None:
