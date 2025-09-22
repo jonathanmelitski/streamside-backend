@@ -56,7 +56,7 @@ def fetch_usgs_locations(event: scheduler_fn.ScheduledEvent) -> None:
             res = res + future.result()
 
     unique_locs = toolz.unique(res, key=lambda x: x["id"])
-    storage_ref.set(unique_locs)
+    storage_ref.set(list(unique_locs))
 
 
 
