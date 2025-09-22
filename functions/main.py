@@ -41,7 +41,7 @@ def fetch_usgs_locations(event: scheduler_fn.ScheduledEvent) -> None:
     'sd', 'tn', 'tx', 'ut', 'vt', 'va', 'wa', 'wv', 'wi', 'wy'
     ]
 
-    storage_ref = db.reference("/all_usgs_locations")
+    storage_ref = db.reference(path="/all_usgs_locations", url="https://streamside-2b8f1-default-rtdb.firebaseio.com/")
     
     res = []
 
