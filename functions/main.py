@@ -117,6 +117,11 @@ def update_profile(req: https_fn.CallableRequest):
                                 message="The function must be called while authenticated.")
 
     storage_ref = db.reference(path="/profile", url="https://streamside-2b8f1.firebaseio.com/").child(req.auth.uid)
+    if req.data["uid"] != req.auth.uid:
+        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.ABORTED,
+                                        message="Invalid State, ID on profile did not match with auth user id.")
+    else:
+        req.data.pop("uid")
     profile = Profile(req.auth.uid, **req.data)
     storage_ref.set(profile.__dict__)
     return profile.__dict__
