@@ -49,7 +49,6 @@ def fetch_usgs_locations(event: scheduler_fn.ScheduledEvent) -> None:
     res = []
 
     with ThreadPoolExecutor(max_workers=5) as executor:
-        
         futures = (executor.submit(fetch_location, state) for state in all_states)
 
         for future in as_completed(futures):
@@ -59,7 +58,62 @@ def fetch_usgs_locations(event: scheduler_fn.ScheduledEvent) -> None:
     storage_ref.set(list(unique_locs))
 
 
+class Profile:
+     uid: str
+     first_name: str | None = None
+     last_name: str | None = None
+     gauges: list = []
+     markers: list = []
+     fish: list = []
 
-@https_fn.on_request()
-def on_request_example(req: https_fn.Request) -> https_fn.Response:
-    return https_fn.Response("Hello world!")
+     def __init__(self, uid, **kwargs):
+          self.uid = uid
+          self.first_name = kwargs.get("first_name")
+          self.last_name = kwargs.get("last_name")
+          self.gauges = kwargs.get("gauges", [])
+          self.markers = kwargs.get("markers", [])
+          self.fish = kwargs.get("fish", [])
+
+          
+
+@https_fn.on_call()
+def get_or_create_profile(req: https_fn.CallableRequest):
+    if req.app is None:
+            # Throwing an HttpsError so that the client gets the error details.
+            raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                    message="The function must be called from a verified environment.")
+
+    if req.auth is None:
+        # Throwing an HttpsError so that the client gets the error details.
+        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                message="The function must be called while authenticated.")
+
+    storage_ref = db.reference(path="/profile", url="https://streamside-2b8f1.firebaseio.com/").child(req.auth.uid)
+
+    res = storage_ref.get()
+    if not res:
+         profile = Profile(req.auth.uid)
+         storage_ref.set(profile.__dict__)
+         return profile.__dict__
+    else:
+         profile = Profile(req.auth.uid, **res)
+         return profile.__dict__
+
+@https_fn.on_call()
+def update_profile(req: https_fn.CallableRequest):
+    if req.app is None:
+        # Throwing an HttpsError so that the client gets the error details.
+        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                    message="The function must be called from a verified environment.")
+
+    if req.auth is None:
+        # Throwing an HttpsError so that the client gets the error details.
+        raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
+                                message="The function must be called while authenticated.")
+
+    storage_ref = db.reference(path="/profile", url="https://streamside-2b8f1.firebaseio.com/").child(req.auth.uid)
+    profile = Profile(req.auth.uid, **req.data)
+    storage_ref.set(profile.__dict__)
+    return profile.__dict__
+    
+         
