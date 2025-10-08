@@ -96,8 +96,13 @@ def get_or_create_profile(req: https_fn.CallableRequest):
          storage_ref.set(profile.__dict__)
          return profile.__dict__
     else:
-         profile = Profile(req.auth.uid, **res)
-         return profile.__dict__
+        if res["uid"] != req.auth.uid:
+            raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.ABORTED,
+                                        message="Invalid State, ID on profile did not match with auth user id.")
+        else:
+            res.pop("uid")
+        profile = Profile(req.auth.uid, **res)
+        return profile.__dict__
 
 @https_fn.on_call()
 def update_profile(req: https_fn.CallableRequest):
