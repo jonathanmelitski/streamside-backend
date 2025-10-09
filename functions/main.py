@@ -5,6 +5,7 @@
 from firebase_functions import https_fn, scheduler_fn
 from firebase_functions.options import set_global_options
 from firebase_admin import initialize_app, db
+from datetime import datetime
 import requests, json
 import toolz
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -60,6 +61,7 @@ def fetch_usgs_locations(event: scheduler_fn.ScheduledEvent) -> None:
 
 class Profile:
      uid: str
+     last_updated: int
      first_name: str | None = None
      last_name: str | None = None
      gauges: list = []
@@ -71,6 +73,7 @@ class Profile:
           self.first_name = kwargs.get("first_name")
           self.last_name = kwargs.get("last_name")
           self.gauges = kwargs.get("gauges", [])
+          self.last_updated = kwargs.get("last_updated", datetime.now().timestamp())
           self.markers = kwargs.get("markers", [])
           self.fish = kwargs.get("fish", [])
 
