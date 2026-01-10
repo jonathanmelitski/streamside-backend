@@ -73,7 +73,7 @@ class Profile:
           self.first_name = kwargs.get("first_name")
           self.last_name = kwargs.get("last_name")
           self.gauges = kwargs.get("gauges", [])
-          self.last_updated = kwargs.get("last_updated", int(datetime.now().timestamp()))
+          self.last_updated = int(kwargs.get("last_updated", datetime.now().timestamp()))
           self.markers = kwargs.get("markers", [])
           self.fish = kwargs.get("fish", [])
 
