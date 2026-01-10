@@ -91,7 +91,7 @@ def get_or_create_profile(req: https_fn.CallableRequest):
         raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
                                 message="The function must be called while authenticated.")
 
-    storage_ref = db.reference(path="/profile", url="https://streamside-2b8f1.firebaseio.com/").child(req.auth.uid)
+    storage_ref = db.reference(path="/users", url="https://streamside-2b8f1-default-rtdb.firebaseio.com/").child(req.auth.uid)
 
     res = storage_ref.get()
     if not res:
@@ -119,7 +119,7 @@ def update_profile(req: https_fn.CallableRequest):
         raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.FAILED_PRECONDITION,
                                 message="The function must be called while authenticated.")
 
-    storage_ref = db.reference(path="/profile", url="https://streamside-2b8f1.firebaseio.com/").child(req.auth.uid)
+    storage_ref = db.reference(path="/users", url="https://streamside-2b8f1-default-rtdb.firebaseio.com/").child(req.auth.uid)
     if req.data["uid"] != req.auth.uid:
         raise https_fn.HttpsError(code=https_fn.FunctionsErrorCode.ABORTED,
                                         message="Invalid State, ID on profile did not match with auth user id.")
