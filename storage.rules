@@ -1,0 +1,15 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Layer cache files are public read — data is public domain (USGS/NYS DEC)
+    match /layers/{file} {
+      allow read: if true;
+      allow write: if false; // written only by Cloud Functions service account
+    }
+
+    // Everything else requires auth
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

@@ -12,5 +12,15 @@
       ],
       "runtime": "python313"
     }
-  ]
+  ],
+  "storage": {
+    "bucket": "streamside-2b8f1.firebasestorage.app",
+    "rules": "storage.rules"
+  },
+  "emulators": {
+    "functions": { "port": 5001 },
+    "storage": { "port": 9199 },
+    "database": { "port": 9000 },
+    "ui": { "enabled": true, "port": 4000 }
+  }
 }
